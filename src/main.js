@@ -5,6 +5,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import pm2 from 'pm2';
+import os from 'os';
+import path from 'path';
 
 const app   = express();
 const port  = process.env.PORT || 4000; // set our port
@@ -205,15 +207,18 @@ router.delete('/process', (req, res) => {
 // REGISTER OUR ROUTES -------------------------------
 app.use('/api', router);
 
-process.on('SIGINT', function() {
-   console.log('------------------------------ SIGINT');
+const signal = 'SIGINT';
+
+process.on(signal, () => {
+   console.log(`------------------------------ ${signal}`);
 	 var fs = require('fs');
-		fs.writeFile("./greenfrog.hello.test", "Hey there!", function(err) {
+		fs.writeFile(path.join(os.homedir(), 'greenfrog.hello.test'), "Hey there!", function(err) {
 		    if(err) {
+						console.log(`[${signal}] Error is occured. ${os.EOL}${err.toString}`);
 						process.exit(err ? 1 : 0);
 		    }
 
-		    console.log("The file was saved!");
+		    console.log(`[${signal}] The file was saved!`);
 				process.exit(0);
 		});
 
